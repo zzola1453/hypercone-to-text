@@ -1,9 +1,9 @@
 """Qualitative results: which test sentences each model accepts or rejects, plus dataset samples.
 
 Trains MSP and the hypercone + input-space tvMF model (raw cone decision, as in results/input.md)
-on one split and writes its/results/examples.md.
+on one split and writes results/examples.md.
 
-python -m its.examples --dataset clinc --ratio 0.75 --seed 0
+python examples.py --dataset clinc --ratio 0.75 --seed 0
 """
 import argparse
 import os
@@ -11,9 +11,11 @@ import os
 import numpy as np
 import torch
 
-from its.data import load, open_split
-from its.embed import embed
-from its.methods import cone_predict, msp, train_cone, train_softmax
+from data import load, open_split
+from embed import embed
+from methods import cone_predict, msp, train_cone, train_softmax
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def table(rows, header):
@@ -28,7 +30,7 @@ def main():
     p.add_argument("--ratio", type=float, default=0.75)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--n", type=int, default=10)
-    p.add_argument("--out", default="its/results/examples.md")
+    p.add_argument("--out", default=f"{HERE}/results/examples.md")
     a = p.parse_args()
     rng = np.random.RandomState(0)
     data, names, oos = load(a.dataset)

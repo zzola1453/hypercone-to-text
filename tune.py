@@ -3,7 +3,7 @@
 Within the known classes of a split, 25% are held out as pseudo-unknown: models train on the train
 samples of the remaining classes and are scored on the validation samples of all known classes.
 
-python -m its.tune --datasets clinc banking --ratio 0.75 --seeds 0 1
+python tune.py --datasets clinc banking --ratio 0.75 --seeds 0 1
 """
 import argparse
 import itertools
@@ -13,10 +13,12 @@ import os
 import numpy as np
 import torch
 
-from its.data import load, open_split
-from its.embed import DEFAULT_MODEL, embed
-from its.methods import cone_predict, train_cone
-from its.metrics import evaluate
+from data import load, open_split
+from embed import DEFAULT_MODEL, embed
+from methods import cone_predict, train_cone
+from metrics import evaluate
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def grid():
@@ -71,8 +73,8 @@ def main():
     for i, cfg in enumerate(configs):
         table.append({"cfg": cfg, **{c: float(np.mean([s[c] for s in scores[i]])) for c in ("auroc", "fpr95")}})
     table.sort(key=lambda t: -t["auroc"])
-    os.makedirs("its/results", exist_ok=True)
-    with open(f"its/results/{a.tag}.json", "w") as f:
+    os.makedirs(f"{HERE}/results", exist_ok=True)
+    with open(f"{HERE}/results/{a.tag}.json", "w") as f:
         json.dump({"args": vars(a), "table": table}, f, indent=1)
     for t in table:
         print(f"auroc={100 * t['auroc']:.2f} fpr95={100 * t['fpr95']:.2f} {t['cfg']}")

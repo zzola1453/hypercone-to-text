@@ -61,4 +61,4 @@ ADB 논문(Zhang et al., AAAI 2021)과 같은 프로토콜이다 (`data.py`의 `
 
 ## 4. 임베딩
 - 모델: `sentence-transformers/all-mpnet-base-v2` (768차원, 출력이 길이 1로 정규화됨 → 문장이 처음부터 구 위에 있음)
-- 학습하지 않고 고정. 한 번 계산해서 `its/cache/`에 저장
+- 학습하지 않고 고정. 한 번 계산해서 `cache/`에 저장

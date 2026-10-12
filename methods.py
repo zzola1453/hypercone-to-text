@@ -21,7 +21,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from hsdiff.sphere import inverse_bessel_ratio, project, sample_tvmf, sample_vmf
+from sphere import inverse_bessel_ratio, project, sample_tvmf, sample_vmf
 
 EPS = 1e-6
 

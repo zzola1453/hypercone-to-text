@@ -1,9 +1,9 @@
-"""Result figures from its/results/{main,input}.json.
+"""Result figures from results/{main,input}.json.
 
 figures/results_main.png:     AUROC / FPR95 / F1(all) vs known ratio, per dataset (mean ± std over 3 seeds)
 figures/results_ablation.png: F1(all) by virtual-outlier type, accepted without threshold calibration
 
-python -m its.plot_results
+python plot_results.py
 """
 import json
 import os
@@ -12,6 +12,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 SURFACE, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]   # validated categorical slots 1-4 (adjacent)
@@ -24,8 +26,8 @@ METRICS = [("auroc", "AUROC (높을수록 좋음)"), ("fpr95", "FPR95: 새어 �
 
 
 def rows():
-    main = json.load(open("its/results/main.json"))["rows"]
-    inp = [dict(r, method=r["method"].replace("cone_", "in_")) for r in json.load(open("its/results/input.json"))["rows"]]
+    main = json.load(open(f"{HERE}/results/main.json"))["rows"]
+    inp = [dict(r, method=r["method"].replace("cone_", "in_")) for r in json.load(open(f"{HERE}/results/input.json"))["rows"]]
     return main + inp
 
 
@@ -72,7 +74,7 @@ def main_figure(R):
     fig.text(0.5, 0.01, "점 = seed 3개 평균, 세로 막대 = 표준편차. Hypercone 계열은 거부 기준값 보정 없이 원뿔 경계 그대로 판정, "
              "MSP·ADB는 validation known 95% 통과 기준. 임베딩 all-mpnet-base-v2 고정.", ha="center", fontsize=9, color=INK2)
     fig.subplots_adjust(top=0.84, bottom=0.11, hspace=0.3, wspace=0.22)
-    fig.savefig("its/figures/results_main.png", dpi=200, facecolor=SURFACE)
+    fig.savefig(f"{HERE}/figures/results_main.png", dpi=200, facecolor=SURFACE)
 
 
 def ablation_figure(R):
@@ -102,13 +104,13 @@ def ablation_figure(R):
         ax.text(70.2, yy - 1.55 if yy == 1 else yy - 1.05, txt, color=INK2, fontsize=9, fontweight="bold")
     fig.text(0.02, 0.97, "가상 이상치 종류별 F1 (거부 기준값 보정 없이 원뿔 경계 그대로 판정)", fontsize=13, color=INK, va="top")
     fig.subplots_adjust(left=0.28, right=0.96, top=0.84, bottom=0.13)
-    fig.savefig("its/figures/results_ablation.png", dpi=200, facecolor=SURFACE)
+    fig.savefig(f"{HERE}/figures/results_ablation.png", dpi=200, facecolor=SURFACE)
 
 
 if __name__ == "__main__":
     plt.rcParams.update({"font.family": "Malgun Gothic", "axes.unicode_minus": False})
-    os.makedirs("its/figures", exist_ok=True)
+    os.makedirs(f"{HERE}/figures", exist_ok=True)
     R = rows()
     main_figure(R)
     ablation_figure(R)
-    print("saved its/figures/results_main.png, its/figures/results_ablation.png")
+    print("saved figures/results_main.png, figures/results_ablation.png")

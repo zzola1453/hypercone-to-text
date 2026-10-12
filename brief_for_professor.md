@@ -91,4 +91,4 @@ AUROC와 FPR95는 기준선과 무관한 지표라 같은 모델의 두 행에�
 3. 비교 대상과 데이터셋이 충분한지, 꼭 추가해야 할 실험이 있는지
 
 ---
-코드와 전체 결과: `its/` (실행 `python -m its.run`, 결과 `its/results/main.md` · `input.md` · `baselines.md` · `cosine_rules.md`, 튜닝 `its/results/tune.json`, 그림 `its/figures/`, 데이터 설명 `its/DATA.md`, 실험 기록 `its/EXPERIMENTS.md`)
+코드와 전체 결과: https://github.com/zzola1453/hypercone-to-text (실행 `python run.py`, 결과 `results/main.md` · `input.md` · `baselines.md` · `cosine_rules.md`, 튜닝 `results/tune.json`, 그림 `figures/`, 데이터 설명 `DATA.md`, 실험 기록 `EXPERIMENTS.md`)

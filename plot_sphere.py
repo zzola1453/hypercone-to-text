@@ -7,7 +7,7 @@ radius = 95% quantile of the training angles), and the outliers are tvMF draws i
 outside them, with kappa from A_3(kappa) = cos(radius). Illustration only: the 128-d experiments
 use learned prototypes and radii.
 
-python -m its.plot_sphere
+python plot_sphere.py
 """
 import argparse
 import math
@@ -20,10 +20,12 @@ import numpy as np
 import torch
 from matplotlib.lines import Line2D
 
-from its.data import load
-from its.embed import embed
-from hsdiff.metrics import Hypercones
-from its.methods import OutlierSynth, train_cone
+from data import load
+from embed import embed
+from methods import OutlierSynth, train_cone
+from sphere import Hypercones
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 SURFACE, INK, INK2, MUTED = "#fcfcfb", "#0b0b0b", "#52514e", "#a9a8a2"
 SERIES = ["#2a78d6", "#eb6834", "#1baf7a"]          # validated categorical slots 1-3 (all-pairs)
@@ -43,7 +45,7 @@ def main():
     p.add_argument("--n_unknown", type=int, default=250)
     p.add_argument("--delta", type=float, default=0.25)
     p.add_argument("--focus", type=int, default=1, help="cone shown in the close-up panel")
-    p.add_argument("--out", default="its/figures/sphere_embeddings.png")
+    p.add_argument("--out", default=f"{HERE}/figures/sphere_embeddings.png")
     a = p.parse_args()
     torch.manual_seed(0)
     rng = np.random.RandomState(0)

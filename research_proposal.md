@@ -48,9 +48,9 @@ HyperSphereDiff(ICML 2025)의 hypercone을 문장 임베딩에 적용해서, 텍
 ### 3.3 HyperSphereDiff에서 가져온 것
 | 요소 | 코드 | 역할 |
 |---|---|---|
-| hypercone 정의 | `hsdiff/metrics.py` `Hypercones`, `class_angles` | 원뿔 반지름(95% 분위수), 설명용 그림 |
-| vMF 샘플러, tvMF | `hsdiff/sphere.py` `sample_vmf`, `sample_tvmf`, `sample_tvmf_cone` | 가상 이상치 생성 |
-| κ–각도 관계 | `hsdiff/sphere.py` `bessel_ratio`, `inverse_bessel_ratio` | 반지름에서 κ 계산 |
+| hypercone 정의 | `sphere.py` `Hypercones` | 원뿔 반지름(95% 분위수), 설명용 그림 |
+| vMF 샘플러, tvMF | `sphere.py` `sample_vmf`, `sample_tvmf` | 가상 이상치 생성 |
+| κ–각도 관계 | `sphere.py` `bessel_ratio`, `inverse_bessel_ratio` | 반지름에서 κ 계산 |
 
 ---
 

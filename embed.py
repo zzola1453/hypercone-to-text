@@ -3,10 +3,12 @@ import os
 
 import torch
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+
 DEFAULT_MODEL = "sentence-transformers/all-mpnet-base-v2"
 
 
-def embed(name, data, model_name=DEFAULT_MODEL, cache="its/cache"):
+def embed(name, data, model_name=DEFAULT_MODEL, cache=f"{HERE}/cache"):
     """data: {split: (texts, labels)} -> {split: float tensor (N, D)} (raw, not normalised)."""
     os.makedirs(cache, exist_ok=True)
     path = os.path.join(cache, f"{name}_{model_name.split('/')[-1]}.pt")

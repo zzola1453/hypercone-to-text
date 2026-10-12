@@ -5,9 +5,9 @@
 어느 원뿔 안에 들어온 문장은 그 의도로 분류하고, 어느 원뿔에도 들어오지 않은 문장은 "모르는 문장"으로 거부한다.
 
 원뿔이라는 기하는 HyperSphereDiff(Dosi et al., ICML 2025)에서 가져왔다. 그 논문은 원뿔과 truncated vMF 분포로 **생성 샘플을 클래스 안에 가두는 데** 썼고,
-여기서는 같은 도구를 **분류하고 거부하는 데** 쓴다. 상위 폴더의 `hsdiff/sphere.py`(vMF 샘플러, Bessel 비율)를 그대로 가져다 쓴다.
+여기서는 같은 도구를 **분류하고 거부하는 데** 쓴다. vMF·truncated vMF 샘플러와 Bessel 비율은 `sphere.py`에 들어 있다.
 
-**결과 한 줄 요약**: 두 벤치마크의 18개 설정에서 원뿔 분류기는 softmax 확신도(MSP), Energy, kNN, ADB보다 일관되게 좋았다(모두 p < 0.01).
+**결과 요약**: 두 벤치마크의 18개 설정에서 원뿔 분류기는 softmax 확신도(MSP), Energy, kNN, ADB보다 일관되게 좋았다(모두 p < 0.01).
 가장 강한 기준인 Mahalanobis와는 통계적으로 같은 수준인데, 원뿔은 클래스당 방향 하나와 반지름 하나만 쓰고 거부 기준값을 따로 맞추지 않아도 된다.
 
 ---
@@ -220,7 +220,7 @@ o \sim p(o) \propto \exp\!\big(\kappa_k\, c_k^\top o\big) \cdot \mathbb{1}\big[\
 $$
 
 뽑은 점은 MLP를 통과하므로, 이상치의 gradient가 반지름뿐 아니라 표현 $\varphi$까지 바꾼다.
-샘플링은 중심과의 각도 $\phi$의 밀도 $\propto \exp(\kappa \cos\phi)\sin^{n-2}\phi$를 띠로 잘라 역CDF로 뽑고, 방향은 접평면에서 균일하게 뽑는다(`hsdiff.sphere.sample_tvmf`).
+샘플링은 중심과의 각도 $\phi$의 밀도 $\propto \exp(\kappa \cos\phi)\sin^{n-2}\phi$를 띠로 잘라 역CDF로 뽑고, 방향은 접평면에서 균일하게 뽑는다(`sphere.sample_tvmf`).
 
 **(10) 집중도 κ는 반지름에서 계산**
 
@@ -387,45 +387,55 @@ MSP는 관련 없는 문장에도 확률 1 근처의 높은 확신을 줘서 두
 ## 9. 실행 방법
 
 ### 설치
-저장소 루트(`HypersphereDiff/`)에서 실행한다. `its`가 `hsdiff` 패키지를 import하므로 반드시 루트에서 `python -m its.<모듈>` 형태로 실행해야 한다.
+저장소 하나로 완결된다. 다른 저장소나 상위 폴더의 코드는 필요 없다. Python 3.13에서 확인했다.
 
 ```
+git clone https://github.com/zzola1453/hypercone-to-text.git
+cd hypercone-to-text
 python -m venv .venv
 .venv/Scripts/python -m pip install torch --index-url https://download.pytorch.org/whl/cu128
-.venv/Scripts/python -m pip install numpy scipy matplotlib scikit-learn datasets sentence-transformers
+.venv/Scripts/python -m pip install -r requirements.txt
 ```
 
-처음 실행하면 데이터셋(Hugging Face)과 인코더를 내려받고, 문장 임베딩을 `its/cache/`에 저장한다. 두 번째부터는 캐시를 쓴다.
-GPU가 있으면 자동으로 쓴다.
+(macOS/Linux는 `.venv/bin/python`. CUDA가 없으면 첫 줄 대신 `pip install torch`.)
+
+처음 실행하면 데이터셋(Hugging Face)과 인코더를 내려받고, 문장 임베딩을 `cache/`에 저장한다. 두 번째부터는 캐시를 쓴다.
+GPU가 있으면 자동으로 쓴다. 결과·캐시·그림 경로는 스크립트 위치 기준이라 어느 폴더에서 실행해도 같은 곳에 저장된다.
+
+테스트(분할·지표·vMF/tvMF 샘플러·원뿔 학습):
+
+```
+python -m pytest
+```
 
 ### 실험 재현
-각 명령은 결과를 `its/results/<tag>.json`(설정·seed별 원본 값)과 `<tag>.md`(평균 ± 표준편차 표)로 저장한다.
+각 명령은 결과를 `results/<tag>.json`(설정·seed별 원본 값)과 `<tag>.md`(평균 ± 표준편차 표)로 저장한다.
 
 ```
 # 7.1 메인 비교: MSP, ADB, 원뿔(이상치 없음 / feature 공간 Gaussian·vMF·tvMF)
-python -m its.run --tag main
+python run.py --tag main
 
 # 7.1·7.3 입력 공간 가상 이상치 (튜닝으로 고른 설정)
-python -m its.run --methods cone_q cone_gauss cone_tvmf --space input --delta 0.15 --tag input
+python run.py --methods cone_q cone_gauss cone_tvmf --space input --delta 0.15 --tag input
 
 # 7.1 기준 방법 추가: Energy, Mahalanobis, kNN
-python -m its.run --methods msp energy maha knn --tag baselines
+python run.py --methods msp energy maha knn --tag baselines
 
 # 7.2 같은 cosine 신경망 위에서 판정 방식만 비교
-python -m its.run --methods cone_q cq_msp cq_maha cq_maha_raw cq_knn --tag cosine_rules
+python run.py --methods cone_q cq_msp cq_maha cq_maha_raw cq_knn --tag cosine_rules
 
 # 하이퍼파라미터 튜닝 (test 미사용: known 의도의 25%를 가짜 unknown으로 떼어 validation으로만 평가)
-python -m its.tune
+python tune.py
 
-# 7.4 실제 문장 판정 사례 → its/results/examples.md
-python -m its.examples
+# 7.4 실제 문장 판정 사례 → results/examples.md
+python examples.py
 
 # 요약 그림 4개(figures/summary_*.png)와 요약표(results/summary.md). 위 실험 결과 json 4개가 필요하다
-python -m its.plot_summary
+python plot_summary.py
 
 # 그림
-python -m its.plot_sphere      # figures/sphere_embeddings.png
-python -m its.plot_results     # figures/results_main.png, figures/results_ablation.png (main.json, input.json 필요)
+python plot_sphere.py      # figures/sphere_embeddings.png
+python plot_results.py     # figures/results_main.png, figures/results_ablation.png (main.json, input.json 필요)
 ```
 
 자주 쓰는 `run` 옵션:
@@ -464,12 +474,15 @@ python -m its.plot_results     # figures/results_main.png, figures/results_ablat
 | `embed.py` | 문장 임베딩 계산과 캐시 |
 | `methods.py` | 모든 방법의 학습과 판정. 원뿔 모델 `ConeNet`, 학습 `train_cone`, 판정 `cone_predict`, 가상 이상치 생성 `OutlierSynth` |
 | `metrics.py` | Acc, F1(전체/known/unknown), AUROC, FPR95 |
+| `sphere.py` | 구 위 연산: 정규화, vMF·truncated vMF 샘플링, Bessel 비율 $A_n(\kappa)$와 역함수, 그림용 원뿔 `Hypercones` |
 | `run.py` | 실험 실행과 결과 저장 |
 | `tune.py` | validation만 쓰는 하이퍼파라미터 튜닝 |
 | `examples.py` | 실제 문장 판정 사례 |
 | `plot_sphere.py`, `plot_results.py`, `plot_summary.py` | 그림, 요약표 |
 | `results/` | 실험 결과(`main`, `input`, `baselines`, `cosine_rules`, `tune`, `examples`) |
 | `figures/` | 그림 |
+| `tests/` | 단위 테스트 (`python -m pytest`) |
+| `requirements.txt` | 패키지 버전 |
 
 이 README 외의 문서:
 - `equations.md`: 모델의 핵심 수식 (기본 모델, 가상 이상치, 다른 방법의 판정 규칙 비교)

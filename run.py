@@ -1,7 +1,7 @@
 """Run the open-set benchmark.
 
-python -m its.run --datasets clinc banking --ratios 0.25 0.5 0.75 --seeds 0 1 2
-Results go to its/results/<tag>.json (one row per dataset/ratio/seed/method) and <tag>.md (mean ± std).
+python run.py --datasets clinc banking --ratios 0.25 0.5 0.75 --seeds 0 1 2
+Results go to results/<tag>.json (one row per dataset/ratio/seed/method) and <tag>.md (mean ± std).
 """
 import argparse
 import json
@@ -11,11 +11,13 @@ import time
 import numpy as np
 import torch
 
-from its.data import load, open_split
-from its.embed import DEFAULT_MODEL, embed
-from its.methods import (adb, cone_predict, cosine_msp, energy, knn, mahalanobis, msp, train_cone,
-                         train_softmax)
-from its.metrics import evaluate
+from data import load, open_split
+from embed import DEFAULT_MODEL, embed
+from methods import (adb, cone_predict, cosine_msp, energy, knn, mahalanobis, msp, train_cone,
+                     train_softmax)
+from metrics import evaluate
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 METHODS = ["msp", "adb", "cone_q", "cone_gauss", "cone_vmf", "cone_tvmf"]
 COLS = ["acc", "f1_all", "f1_known", "f1_unknown", "auroc", "fpr95"]
@@ -88,7 +90,7 @@ def main():
     p.add_argument("--tag", default="main")
     a = p.parse_args()
     dev = "cuda" if torch.cuda.is_available() else "cpu"
-    os.makedirs("its/results", exist_ok=True)
+    os.makedirs(f"{HERE}/results", exist_ok=True)
     rows = []
     for ds in a.datasets:
         data, names, oos = load(ds)
@@ -109,10 +111,10 @@ def main():
                         rows.append({"dataset": ds, "ratio": ratio, "seed": seed, "method": name, "K": K, **r})
                         print(f"{ds} {ratio} s{seed} {name:15s} " + " ".join(f"{c}={100 * r[c]:.2f}" for c in COLS)
                               + f" ({time.time() - t0:.0f}s)", flush=True)
-                with open(f"its/results/{a.tag}.json", "w") as f:
+                with open(f"{HERE}/results/{a.tag}.json", "w") as f:
                     json.dump({"args": vars(a), "rows": rows}, f, indent=1)
     md = summarize(rows)
-    with open(f"its/results/{a.tag}.md", "w", encoding="utf-8") as f:
+    with open(f"{HERE}/results/{a.tag}.md", "w", encoding="utf-8") as f:
         f.write(f"args: {vars(a)}\n" + md)
     print(md)
 

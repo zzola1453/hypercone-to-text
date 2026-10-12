@@ -1,4 +1,4 @@
-"""Summary figures and tables for the professor briefing, from its/results/{main,input,baselines,cosine_rules}.json.
+"""Summary figures and tables for the professor briefing, from results/{main,input,baselines,cosine_rules}.json.
 
 figures/summary_overall.png:  every method on AUROC / FPR95 / F1, 18-setting mean
 figures/summary_paired.png:   per-setting hypercone vs MSP / kNN / Mahalanobis (AUROC, FPR95)
@@ -7,8 +7,8 @@ figures/summary_margin.png:   score distributions of known vs unknown test sente
                               dataset; trains the two models, needs the embedding cache)
 results/summary.md:           the same numbers as tables, with paired win counts and Wilcoxon tests
 
-python -m its.plot_summary            # everything
-python -m its.plot_summary --no_margin  # skip the figure that trains models
+python plot_summary.py            # everything
+python plot_summary.py --no_margin  # skip the figure that trains models
 """
 import argparse
 import json
@@ -20,7 +20,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import wilcoxon
 
-from its.plot_results import GRID, INK, INK2, SERIES, SURFACE, style
+from plot_results import GRID, INK, INK2, SERIES, SURFACE, style
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 MUTED = "#a9a7a1"
 DATASETS = [("clinc", "CLINC150"), ("banking", "BANKING77")]
@@ -36,7 +38,7 @@ METRICS = [("auroc", "AUROC", "높을수록 좋음", True), ("fpr95", "FPR95", "
 def load_rows():
     R = {}
     for tag, prefix in (("main", ""), ("baselines", ""), ("cosine_rules", ""), ("input", "in_")):
-        for r in json.load(open(f"its/results/{tag}.json"))["rows"]:
+        for r in json.load(open(f"{HERE}/results/{tag}.json"))["rows"]:
             m = r["method"].replace("cone_", prefix) if prefix and r["method"].startswith("cone_") else r["method"]
             R[(m, r["dataset"], r["ratio"], r["seed"])] = r     # msp / cone_q repeat across files with identical values
     return R
@@ -89,7 +91,7 @@ def overall_figure(R):
              "Hypercone 계열 F1은 보정 없이 원뿔 경계 그대로 판정 (빈 원 = 같은 모델을 보정했을 때).",
              fontsize=8.5, color=INK2)
     fig.subplots_adjust(left=0.13, right=0.98, top=0.83, bottom=0.12, wspace=0.12)
-    fig.savefig("its/figures/summary_overall.png", dpi=200, facecolor=SURFACE)
+    fig.savefig(f"{HERE}/figures/summary_overall.png", dpi=200, facecolor=SURFACE)
     plt.close(fig)
 
 
@@ -130,7 +132,7 @@ def paired_figure(R):
     fig.text(0.01, 0.012, "윗줄 AUROC(높을수록 좋음), 아랫줄 FPR95(낮을수록 좋음). 점선은 두 방법이 같은 선, 파란 영역에 있으면 "
              "Hypercone이 나은 설정. 기준 방법은 모두 같은 임베딩·같은 크기 MLP.", fontsize=8.5, color=INK2)
     fig.subplots_adjust(left=0.07, right=0.98, top=0.9, bottom=0.08, hspace=0.32, wspace=0.25)
-    fig.savefig("its/figures/summary_paired.png", dpi=200, facecolor=SURFACE)
+    fig.savefig(f"{HERE}/figures/summary_paired.png", dpi=200, facecolor=SURFACE)
     plt.close(fig)
 
 
@@ -159,7 +161,7 @@ def gain_figure(R):
     fig.text(0.02, 0.885, "한 번에 하나씩만 바꿔 가며 비교. 학습 방식 변경과 원뿔 판정이 이득을 나눠 만든다.",
              fontsize=9, color=INK2, va="top")
     fig.subplots_adjust(left=0.1, right=0.97, top=0.8, bottom=0.2)
-    fig.savefig("its/figures/summary_gain.png", dpi=200, facecolor=SURFACE)
+    fig.savefig(f"{HERE}/figures/summary_gain.png", dpi=200, facecolor=SURFACE)
     plt.close(fig)
 
 
@@ -167,9 +169,9 @@ def margin_figure(ratio=0.75, seed=0):
     import torch
     import torch.nn.functional as F
 
-    from its.data import load, open_split
-    from its.embed import embed
-    from its.methods import train_cone, train_softmax
+    from data import load, open_split
+    from embed import embed
+    from methods import train_cone, train_softmax
 
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     fig, axes = plt.subplots(2, 2, figsize=(13, 7.8), facecolor=SURFACE)
@@ -216,7 +218,7 @@ def margin_figure(ratio=0.75, seed=0):
     fig.text(0.01, 0.012, "세로선 오른쪽은 수용, 왼쪽은 거부. MSP는 관련 없는 문장도 확률 1 근처에 몰려 두 분포가 겹치고, "
              "원뿔은 관련 없는 문장 대부분이 경계(0°) 바깥에 놓인다. 각 색의 막대 합은 100%.", fontsize=8.5, color=INK2)
     fig.subplots_adjust(left=0.06, right=0.98, top=0.9, bottom=0.09, hspace=0.38, wspace=0.15)
-    fig.savefig("its/figures/summary_margin.png", dpi=200, facecolor=SURFACE)
+    fig.savefig(f"{HERE}/figures/summary_margin.png", dpi=200, facecolor=SURFACE)
     plt.close(fig)
     return stats
 
@@ -249,7 +251,7 @@ def summary_md(R, margin_stats):
         return f"**{s}**" if abs(values(R, m, c, ds).mean() - best(c, higher, ds)) < 1e-9 else s
 
     out = ["# 결과 요약표", "",
-           "`python -m its.plot_summary`로 생성. 값은 % 단위, `평균 ± 표준편차`. "
+           "`python plot_summary.py`로 생성. 값은 % 단위, `평균 ± 표준편차`. "
            "\"보정\"은 validation의 학습한 문장 95%가 통과하도록 기준값을 맞춘 판정, \"경계 그대로\"는 원뿔 경계(m ≥ 0)로 바로 판정한 것. "
            "AUROC·FPR95는 기준값과 무관해서 같은 모델의 두 판정에서 값이 같다. 열마다 가장 좋은 값은 굵게.", ""]
     hdr = ["방법", "판정", "AUROC ↑", "FPR95 ↓", "F1 전체 ↑", "F1 known ↑", "F1 unknown ↑"]
@@ -297,7 +299,7 @@ def summary_md(R, margin_stats):
         out += ["## 6. 판정 결과 (known 75%, seed 0, 이상치 없는 Hypercone은 경계 그대로)", "",
                 md_table(["데이터셋", "방법", "새어 들어온 관련 없는 문장", "잘못 거부한 학습 문장"],
                          [[d, m, f"{a:.1f}%", f"{b:.1f}%"] for d, m, a, b in margin_stats], left=2), ""]
-    with open("its/results/summary.md", "w", encoding="utf-8") as f:
+    with open(f"{HERE}/results/summary.md", "w", encoding="utf-8") as f:
         f.write("\n".join(out))
 
 
@@ -306,11 +308,11 @@ if __name__ == "__main__":
     p.add_argument("--no_margin", action="store_true")
     a = p.parse_args()
     plt.rcParams.update({"font.family": "Malgun Gothic", "axes.unicode_minus": False})
-    os.makedirs("its/figures", exist_ok=True)
+    os.makedirs(f"{HERE}/figures", exist_ok=True)
     R = load_rows()
     overall_figure(R)
     paired_figure(R)
     gain_figure(R)
     stats = None if a.no_margin else margin_figure()
     summary_md(R, stats)
-    print("saved its/figures/summary_*.png, its/results/summary.md")
+    print("saved figures/summary_*.png, results/summary.md")
