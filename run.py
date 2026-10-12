@@ -13,7 +13,8 @@ import torch
 
 from its.data import load, open_split
 from its.embed import DEFAULT_MODEL, embed
-from its.methods import adb, cone_predict, msp, train_cone, train_softmax
+from its.methods import (adb, cone_predict, cosine_msp, energy, knn, mahalanobis, msp, train_cone,
+                         train_softmax)
 from its.metrics import evaluate
 
 METHODS = ["msp", "adb", "cone_q", "cone_gauss", "cone_vmf", "cone_tvmf"]
@@ -22,13 +23,34 @@ COLS = ["acc", "f1_all", "f1_known", "f1_unknown", "auroc", "fpr95"]
 
 def run_one(method, xtr, ytr, xva, xte, K, a, seed, cache):
     """Returns {row name: (pred, score)}. Cone methods give a raw (score >= 0) and a calibrated row."""
-    if method in ("msp", "adb"):
+    if method in ("msp", "adb", "energy", "maha", "knn"):
         if "softmax" not in cache:
             cache["softmax"] = train_softmax(xtr, ytr, K, a.epochs, seed)
         net = cache["softmax"]
         if method == "msp":
             return {"msp": msp(net, xva, xte, K)}
+        if method == "energy":
+            return {"energy": energy(net, xva, xte, K)}
+        if method == "maha":
+            return {"maha": mahalanobis(net, xtr, ytr, xva, xte, K)}
+        if method == "knn":
+            return {"knn": knn(net, xtr, xva, xte, K)}
         return {"adb": adb(net, xtr, ytr, xte, K, seed=seed, xval=xva), "adb_raw": adb(net, xtr, ytr, xte, K, seed=seed)}
+    if method.startswith("cq_"):                      # other decision rules on the cone_q (cosine-softmax) network
+        if "coneq" not in cache:
+            cache["coneq"] = train_cone(xtr, ytr, K, a.epochs, seed, outliers="none", q=a.q)
+        net = cache["coneq"][0]
+        cos_logits = lambda x: net.feats(x) @ net.protos().T
+        rule = method[3:]
+        if rule == "msp":
+            return {method: cosine_msp(net, xva, xte, K)}
+        if rule == "maha":
+            return {method: mahalanobis(net, xtr, ytr, xva, xte, K, feat=net.feats)}
+        if rule == "maha_raw":
+            return {method: mahalanobis(net, xtr, ytr, xva, xte, K, feat=net.body)}
+        if rule == "knn":
+            return {method: knn(net, xtr, xva, xte, K, feat=net.feats, logits=cos_logits)}
+        raise ValueError(method)
     kind = method.split("_", 1)[1]
     net, theta = train_cone(xtr, ytr, K, a.epochs, seed, outliers="none" if kind == "q" else kind,
                             space=a.space, beta=a.beta, gamma=a.gamma, delta=a.delta, q=a.q)

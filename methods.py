@@ -68,6 +68,59 @@ def msp(net, xval, xte, K, tpr=0.95):
     return torch.where(p >= tau, pred, torch.full_like(pred, K)), p
 
 
+def _accept(score_val, score_te, pred, K, tpr=0.95):
+    """Reject when the score is below the level that accepts `tpr` of the (known-only) validation set."""
+    level = score_val.quantile(1 - tpr)
+    return torch.where(score_te >= level, pred, torch.full_like(pred, K)), score_te
+
+
+@torch.no_grad()
+def energy(net, xval, xte, K, tpr=0.95):
+    """Energy score (Liu et al., NeurIPS 2020): logsumexp of the logits, higher = known."""
+    lv, lt = net(xval), net(xte)
+    return _accept(torch.logsumexp(lv, 1), torch.logsumexp(lt, 1), lt.argmax(1), K, tpr)
+
+
+@torch.no_grad()
+def mahalanobis(net, x, y, xval, xte, K, tpr=0.95, feat=None):
+    """Mahalanobis distance (Lee et al., NeurIPS 2018) on the penultimate features: class means with a
+    shared covariance; predict the nearest class, score = minus the smallest distance.
+    `feat` replaces the feature map (default: the network body)."""
+    feat = feat or net.body
+    f = feat(x)
+    mu = torch.stack([f[y == k].mean(0) for k in range(K)])
+    prec = torch.linalg.pinv(torch.cov((f - mu[y]).T))
+
+    def dist(z):
+        d = z[:, None, :] - mu[None]                          # (N, K, d)
+        return torch.einsum("nkd,de,nke->nk", d, prec, d)
+
+    dv, dt = dist(feat(xval)), dist(feat(xte))
+    return _accept(-dv.min(1).values, -dt.min(1).values, dt.argmin(1), K, tpr)
+
+
+@torch.no_grad()
+def knn(net, x, xval, xte, K, k=10, tpr=0.95, feat=None, logits=None):
+    """Deep nearest neighbours (Sun et al., ICML 2022): L2-normalised penultimate features, score = minus the
+    distance to the k-th nearest training feature; the class comes from the classifier head.
+    `feat` / `logits` replace the feature map and the head (default: the softmax network)."""
+    feat, logits = feat or net.body, logits or net
+    bank = F.normalize(feat(x), dim=1)
+
+    def score(z):
+        return -torch.cdist(F.normalize(feat(z), dim=1), bank).topk(k, largest=False).values[:, -1]
+
+    return _accept(score(xval), score(xte), logits(xte).argmax(1), K, tpr)
+
+
+@torch.no_grad()
+def cosine_msp(net, xval, xte, K, scale=16.0, tpr=0.95):
+    """MSP of a ConeNet's cosine-softmax head, softmax(scale * cos(z, mu_k))."""
+    p = lambda x: F.softmax(scale * net.feats(x) @ net.protos().T, 1).max(1)
+    (pv, _), (pt, pred) = p(xval), p(xte)
+    return _accept(pv, pt, pred, K, tpr)
+
+
 def adb(net, x, y, xte, K, epochs=100, bs=128, lr=0.05, seed=0, xval=None, tpr=0.95):
     """With `xval`, the accept level is calibrated on known validation data as in `cone_predict`
     (the ADB loss alone drives each radius to the median training distance)."""

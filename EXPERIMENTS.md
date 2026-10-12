@@ -55,11 +55,40 @@
 - **결과**: 원뿔 반지름 약 10~13°. 테스트에서 known 문장 92% 통과, 관련 없는 문장(250개 표본) 84% 거부.
 - **주의**: 설명용 그림이다. 처음에는 학습한 prototype을 원뿔 중심으로 썼는데, 3차원·3클래스에서는 cosine CE가 prototype을 문장 무리 중심에 두지 않아 문장이 원뿔 가장자리에 몰려 보였다. 그래서 그림에서는 원 논문의 원뿔 정의를 썼다. 128차원 본 실험(학습한 원뿔)과 설정이 다르다.
 
+## E5. hypersphere 없는 거르기 방법과 비교
+- **질문**: "모르겠다"는 hypersphere 없이도 할 수 있다. 흔히 쓰는 다른 거르기 방법(Energy, Mahalanobis, kNN)보다도 원뿔이 나은가?
+- **설정**: `--methods msp energy maha knn --tag baselines`. 네 방법 모두 MSP와 같은 softmax 신경망과 같은 128차원 feature를 쓰고, 거부 기준은 validation의 학습한 문장 95% 통과로 맞춤. MSP 결과가 E1과 완전히 같게 재현됨을 확인(차이 0). kNN의 k=10은 튜닝하지 않음.
+- **결과** (`results/baselines.md`, 18개 설정 평균):
+  | 방법 | AUROC | FPR95 | F1 |
+  |---|---|---|---|
+  | Energy | 89.01 | 43.36 | 76.23 |
+  | kNN (k=10) | 91.45 | 42.77 | 76.74 |
+  | Mahalanobis | 92.62 | 35.35 | 81.19 |
+  | Hypercone (validation 보정) | 93.39 | 32.80 | 81.00 |
+  - 원뿔 vs Energy: AUROC +4.4%p (18/18), vs kNN: +1.9%p (17/18)
+  - 원뿔 vs **Mahalanobis: AUROC +0.8%p (13/18), FPR95 −2.6%p (11/18), F1 −0.2%p (11/18)**
+- **결론**: 원뿔은 Energy·kNN·MSP보다 확실히 낫지만, Mahalanobis와는 차이가 작다. "hypersphere라서 크게 낫다"고 주장할 수는 없고, "각도 원뿔은 Mahalanobis 수준의 성능을 공분산 추정 없이, 기준값 보정 없이 낸다"가 정직한 주장이다. 원뿔 쪽 feature는 cosine softmax로 학습했고 나머지는 일반 softmax라서, 차이의 일부는 학습 방식 차이일 수 있다.
+
+## E6. 같은 cosine softmax 신경망 위에서 판정 방식만 비교
+- **질문**: E5에서 원뿔이 Mahalanobis보다 약간 나았던 건 판정 방식 덕분인가, 원뿔 쪽 신경망을 cosine softmax로 학습한 덕분인가?
+- **설정**: `--methods cone_q cq_msp cq_maha cq_maha_raw cq_knn --tag cosine_rules`. 원뿔(cone_q)과 같은 신경망 하나를 학습하고, 그 위에서 cosine MSP, Mahalanobis(정규화 feature z / 정규화 전 feature), kNN(k=10, z)을 계산. 거부 기준은 모두 validation 95% 통과. cone_q가 E1과 같게 재현됨을 확인(차이 0).
+- **결과** (`results/cosine_rules.md`, 18개 설정 평균):
+  | 판정 방식 (같은 cosine 신경망) | AUROC | FPR95 | F1 | 원뿔 승 (AUROC) |
+  |---|---|---|---|---|
+  | cosine MSP | 92.28 | 38.92 | 79.33 | 18/18 |
+  | Mahalanobis (z) | 92.18 | 37.40 | 79.00 | 14/18 |
+  | Mahalanobis (정규화 전) | 92.05 | 37.19 | 78.79 | 16/18 |
+  | kNN (z) | 93.46 | 32.84 | 81.10 | 9/18 |
+  | 원뿔 | 93.39 | 32.80 | 81.00 | — |
+  - 학습 방식 효과: MSP는 softmax → cosine 학습으로 AUROC +2.5%p(18/18). Mahalanobis는 오히려 −0.4%p(7/18).
+- **결론**: 원뿔이 Mahalanobis보다 나은 건 학습 방식만의 효과가 아니다. 같은 신경망에서도 원뿔이 AUROC +1.2%p, 14/18 설정에서 앞선다. MSP 대비 이득(+3.6%p)은 cosine 학습(+2.5)과 원뿔 판정(+1.1)이 나눠 만든다. 같은 feature의 kNN과는 동률이지만, kNN은 학습 문장 전체를 저장·탐색하고 원뿔은 클래스당 방향 하나와 반지름 하나만 쓴다.
+
 ---
 
 ## 아직 하지 않은 실험
 - StackOverflow, KLUE-YNAT 데이터셋
 - 임베딩 모델 fine-tuning (이상치가 표현 자체를 바꾸는지 확인하려면 필요)
 - ADB / DA-ADB 공식 코드 비교, DCLOOS·VOS 원본·LMCL+LOF 실행
+- LLM에게 직접 판정시키는 비교 (정확도, 속도, 비용)
 - 입력 공간에서 자르지 않은 vMF
 - 튜닝을 25/50% 설정과 더 많은 seed로 확대

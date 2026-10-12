@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 500" width="1120" height="500">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#14181f"/></marker><marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2459b8"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8501f"/></marker></defs>
+<rect width="1120" height="500" fill="#ffffff"/>
+<rect x="30" y="22" width="22" height="14" rx="3" fill="#eef0f3" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5 4"/>
+<text x="60" y="34" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:400" fill="#4d5664">frozen</text>
+<rect x="130" y="22" width="22" height="14" rx="3" fill="#e3ebf8" stroke="#2459b8" stroke-width="1.6"/>
+<text x="160" y="34" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:400" fill="#4d5664">trainable</text>
+<rect x="251" y="22" width="22" height="14" rx="3" fill="#ffffff" stroke="#9aa3ae" stroke-width="1.6"/>
+<text x="281" y="34" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:400" fill="#4d5664">parameter-free</text>
+<rect x="407" y="22" width="22" height="14" rx="3" fill="#f7e6dc" stroke="#b8501f" stroke-width="1.6"/>
+<text x="437" y="34" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:400" fill="#4d5664">virtual outliers (extension)</text>
+<rect x="30" y="77" width="115" height="76" rx="10" fill="#ffffff" stroke="#9aa3ae" stroke-width="1.6"/>
+<text x="87" y="109" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-style:italic;font-size:18px;font-weight:700" fill="#14181f">x</text>
+<text x="87" y="131" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:400" fill="#4d5664">sentence</text>
+<rect x="185" y="77" width="150" height="76" rx="10" fill="#eef0f3" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5 4"/>
+<text x="260" y="107" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-style:italic;font-size:15px;font-weight:700" fill="#14181f">f_enc</text>
+<text x="260" y="129" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11.5px;font-weight:400" fill="#4d5664">all-mpnet-base-v2</text>
+<rect x="395" y="77" width="150" height="76" rx="10" fill="#e3ebf8" stroke="#2459b8" stroke-width="1.6"/>
+<text x="470" y="107" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:15px;font-weight:700" fill="#14181f">g_φ (MLP)</text>
+<text x="470" y="129" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11.5px;font-weight:400" fill="#4d5664">768 → 512 → 128</text>
+<rect x="595" y="77" width="105" height="76" rx="10" fill="#ffffff" stroke="#9aa3ae" stroke-width="1.6"/>
+<text x="647" y="120" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:15px;font-weight:700" fill="#14181f">h / ‖h‖</text>
+<rect x="750" y="67" width="160" height="96" rx="10" fill="#e3ebf8" stroke="#2459b8" stroke-width="1.6"/>
+<text x="830" y="97" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:13px;font-weight:700" fill="#14181f">{(μ_k, θ_k)}, k = 1..K</text>
+<text x="830" y="121" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12.5px;font-weight:400" fill="#14181f">m_k = θ_k − ∠(z, μ_k)</text>
+<text x="830" y="143" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11.5px;font-weight:400" fill="#4d5664">μ_k ∈ S¹²⁷</text>
+<rect x="950" y="67" width="150" height="44" rx="10" fill="#e3ebf8" stroke="#2459b8" stroke-width="1.6"/>
+<text x="1025" y="87" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12.5px;font-weight:600" fill="#14181f">ŷ = argmax_k m_k</text>
+<text x="1025" y="104" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11px;font-weight:400" fill="#4d5664">if max_k m_k ≥ 0</text>
+<rect x="950" y="129" width="150" height="44" rx="10" fill="#f7e6dc" stroke="#b8501f" stroke-width="1.6"/>
+<text x="1025" y="149" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12.5px;font-weight:600" fill="#14181f">reject</text>
+<text x="1025" y="166" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11px;font-weight:400" fill="#4d5664">if max_k m_k &lt; 0</text>
+<polyline points="145,115 183,115" fill="none" stroke="#14181f" stroke-width="1.5" marker-end="url(#a)"/>
+<polyline points="335,115 393,115" fill="none" stroke="#14181f" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="364" y="105" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-style:italic;font-size:14px;font-weight:700" fill="#14181f">e</text>
+<text x="364" y="137" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11px;font-weight:400" fill="#4d5664">∈ S⁷⁶⁷</text>
+<polyline points="545,115 593,115" fill="none" stroke="#14181f" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="569" y="105" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-style:italic;font-size:14px;font-weight:700" fill="#14181f">h</text>
+<text x="569" y="137" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11px;font-weight:400" fill="#4d5664">∈ ℝ¹²⁸</text>
+<polyline points="700,115 748,115" fill="none" stroke="#14181f" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="724" y="105" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-style:italic;font-size:14px;font-weight:700" fill="#14181f">z</text>
+<text x="724" y="137" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11px;font-weight:400" fill="#4d5664">∈ S¹²⁷</text>
+<polyline points="910,95 930,95 930,89 948,89" fill="none" stroke="#14181f" stroke-width="1.5" marker-end="url(#a)"/>
+<polyline points="930,95 930,151 948,151" fill="none" stroke="#14181f" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="750" y="280" width="350" height="150" rx="10" fill="#ffffff" stroke="#9aa3ae" stroke-width="1.6"/>
+<text x="925" y="304" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:13.5px;font-weight:700" fill="#14181f">Loss</text>
+<text x="765" y="330" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:400" fill="#14181f">L_CE = −log softmax(s · cos(z, μ_k))_y</text>
+<text x="765" y="354" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:400" fill="#b8501f">L_in = relu(∠(z, μ_y) − θ_y)</text>
+<text x="765" y="378" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:400" fill="#b8501f">L_out = relu(max_k (θ_k − ∠(o′, μ_k)))</text>
+<text x="765" y="410" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12.5px;font-weight:600" fill="#14181f">L = L_CE + α·L_in + β·L_out</text>
+<polyline points="795,163 795,278" fill="none" stroke="#14181f" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="802" y="250" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11px;font-weight:400" fill="#4d5664">cos(z, μ_k)</text>
+<text x="802" y="266" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11px;font-weight:400" fill="#4d5664">∠(z, μ_k)</text>
+<polyline points="880,280 880,165" fill="none" stroke="#2459b8" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#ab)"/>
+<text x="887" y="205" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:600" fill="#2459b8">∇L</text>
+<polyline points="750,455 470,455 470,155" fill="none" stroke="#2459b8" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#ab)"/>
+<text x="610" y="474" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12px;font-weight:600" fill="#2459b8">∇L → φ, μ_k, θ_k</text>
+<rect x="30" y="280" width="390" height="120" rx="10" fill="#f7e6dc" stroke="#b8501f" stroke-width="1.6"/>
+<text x="225" y="306" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:13.5px;font-weight:700" fill="#b8501f">tvMF virtual outliers</text>
+<text x="225" y="334" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12.5px;font-weight:400" fill="#14181f">o ~ tvMF(c_k, κ_k)</text>
+<text x="225" y="358" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12.5px;font-weight:400" fill="#14181f">r_k ≤ ∠(o, c_k) ≤ r_k + δ</text>
+<text x="225" y="382" text-anchor="middle" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:12.5px;font-weight:400" fill="#14181f">A_d(κ_k) = cos r_k</text>
+<polyline points="364,280 364,145" fill="none" stroke="#b8501f" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#ao)"/>
+<text x="372" y="172" text-anchor="start" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11.5px;font-weight:600" fill="#b8501f">(a) input space</text>
+<polyline points="420,310 724,310 724,145" fill="none" stroke="#b8501f" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#ao)"/>
+<text x="716" y="172" text-anchor="end" style="font-family:'Helvetica Neue',Arial,'Segoe UI',sans-serif;font-size:11.5px;font-weight:600" fill="#b8501f">(b) feature space</text>
+</svg>
