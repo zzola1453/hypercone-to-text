@@ -66,7 +66,7 @@ ADB와 원뿔은 둘 다 클래스별 닫힌 영역이지만, ADB의 거리는 �
 
 ## 3. 방법 한눈에 보기
 
-![구 위의 문장 임베딩과 클래스 원뿔](figures/sphere_embeddings.png)
+![구 위의 문장 임베딩과 클래스 원뿔](figures/sphere_paper.png)
 
 위 그림은 설명을 위해 모델 출력을 3차원으로 줄여서 실제로 학습시킨 결과다(본 실험은 128차원).
 CLINC150의 의도 3개(weather, play_music, balance)만 학습했다.
