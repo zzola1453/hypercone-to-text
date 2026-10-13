@@ -4,3 +4,5 @@ cache/
 *.pt
 *.log
 .pytest_cache/
+reference/
+brief_for_professor.md

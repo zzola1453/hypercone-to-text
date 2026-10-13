@@ -39,14 +39,18 @@ def cone_circle(mu, theta, n=200):
     return math.cos(theta) * mu[None] + math.sin(theta) * (np.cos(t)[:, None] * a + np.sin(t)[:, None] * b)
 
 
-def main():
+def args(argv=None, out=f"{HERE}/figures/sphere_embeddings.png"):
     p = argparse.ArgumentParser()
     p.add_argument("--classes", nargs=3, default=["weather", "play_music", "balance"])
     p.add_argument("--n_unknown", type=int, default=250)
     p.add_argument("--delta", type=float, default=0.25)
     p.add_argument("--focus", type=int, default=1, help="cone shown in the close-up panel")
-    p.add_argument("--out", default=f"{HERE}/figures/sphere_embeddings.png")
-    a = p.parse_args()
+    p.add_argument("--out", default=out)
+    return p.parse_args(argv)
+
+
+def compute(a):
+    """Train the d=3 cone model and return everything the figures draw."""
     torch.manual_seed(0)
     rng = np.random.RandomState(0)
 
@@ -76,6 +80,14 @@ def main():
     yk = np.array([remap[c] for c in yte_all[ik]])
     th = cones.theta.cpu().numpy()
     print(f"theta (rad) = {np.round(th, 3)}; known test accepted {acc:.1%}, unknown rejected {rej:.1%}")
+
+    return dict(zk=zk, zu=zu, yk=yk, P=P, th=th, out=out, r=syn.r.cpu().numpy(), acc=acc, rej=rej)
+
+
+def main():
+    a = args()
+    D = compute(a)
+    zk, zu, yk, P, th, out, acc, rej = (D[k] for k in ("zk", "zu", "yk", "P", "th", "out", "acc", "rej"))
 
     v = P.sum(0)
     v /= np.linalg.norm(v)                         # look from the mean direction of the three cones
@@ -129,7 +141,7 @@ def main():
 
     # (b) close-up of one cone, azimuthal equidistant around its axis: radius = true angle (deg)
     k = a.focus
-    mu, r = P[k], float(syn.r[k])
+    mu, r = P[k], float(D["r"][k])
     e1 = np.cross(mu, [1.0, 0, 0] if abs(mu[0]) < 0.9 else [0, 1.0, 0])
     e1 /= np.linalg.norm(e1)
     e2 = np.cross(mu, e1)

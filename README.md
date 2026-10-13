@@ -434,8 +434,9 @@ python examples.py
 python plot_summary.py
 
 # 그림
-python plot_sphere.py      # figures/sphere_embeddings.png
-python plot_results.py     # figures/results_main.png, figures/results_ablation.png (main.json, input.json 필요)
+python plot_sphere.py        # figures/sphere_embeddings.png
+python plot_sphere_paper.py  # figures/sphere_paper.png (논문용: 제목·주석 없이 범례 하나)
+python plot_results.py       # figures/results_main.png, figures/results_ablation.png (main.json, input.json 필요)
 ```
 
 자주 쓰는 `run` 옵션:
@@ -478,7 +479,7 @@ python plot_results.py     # figures/results_main.png, figures/results_ablation.
 | `run.py` | 실험 실행과 결과 저장 |
 | `tune.py` | validation만 쓰는 하이퍼파라미터 튜닝 |
 | `examples.py` | 실제 문장 판정 사례 |
-| `plot_sphere.py`, `plot_results.py`, `plot_summary.py` | 그림, 요약표 |
+| `plot_sphere.py`, `plot_sphere_paper.py`, `plot_results.py`, `plot_summary.py` | 그림(`plot_sphere_paper.py`는 구 그림의 논문용 버전), 요약표 |
 | `results/` | 실험 결과(`main`, `input`, `baselines`, `cosine_rules`, `tune`, `examples`) |
 | `figures/` | 그림 |
 | `tests/` | 단위 테스트 (`python -m pytest`) |
@@ -490,4 +491,3 @@ python plot_results.py     # figures/results_main.png, figures/results_ablation.
 - `DATA.md`: 데이터셋 상세(크기, 예시 문장, 분할 예시)
 - `EXPERIMENTS.md`: 실험 E0~E6 각각의 질문, 설정, 결과, 다음 행동을 시간 순서로 기록
 - `research_proposal.md`: 관련 연구 정리, novelty 범위, 참고 문헌, 남은 계획
-- `brief_for_professor.md`: 지도교수 보고용 요약
